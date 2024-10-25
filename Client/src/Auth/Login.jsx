@@ -103,19 +103,19 @@ export default function Login() {
               />
             )}
 
-            <Form.Item>
+            <Form.Item className="text-center">
               <Button
                 htmlType="submit"
                 size="large"
-                className="w-full bg-blue-500 rounded-xl"
+                className=" w-96 bg-blue-500 rounded-xl"
                 loading={loading}
               >
                 Sign-In
               </Button>
             </Form.Item>
-                    <Form.Item>
-                        <Link to="/">
-                        <Button size="large" className="w-full bg-blue-500 rounded-xl">
+                    <Form.Item className="text-center">
+                        <Link to="/register">
+                        <Button size="large" className="w-96 bg-blue-500 rounded-xl">
                             Create Account
                         </Button>
                         </Link>

@@ -1,19 +1,14 @@
-// Components/Dashboard/index.jsx
-import  { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Menu, Typography, Row, Col, Card, Statistic, Table, Spin, Alert ,Button } from 'antd';
+import { Typography, Row, Col, Card, Statistic, Table, Spin, Alert, Button } from 'antd';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell 
 } from 'recharts';
-import {  
-  ThunderboltOutlined,
-  BarChartOutlined,
-  ProjectOutlined
-} from '@ant-design/icons';
+import { Sun, LayoutDashboard, FolderKanban, PlusCircle, LogOut } from 'lucide-react';
 import { getAuthToken } from '../utils/auth';
 
-const { Content, Sider } = Layout;
 const { Title } = Typography;
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -33,11 +28,12 @@ const initialDashboardData = {
 };
 
 export default function Dashboard() {
-  const [selectedMenu, setSelectedMenu] = useState('1');
+  const [selectedMenu, setSelectedMenu] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(initialDashboardData);
   const navigate = useNavigate();
+  const {  user } = useSelector((state) => state.auth);
 
   const fetchData = async (endpoint) => {
     try {
@@ -88,13 +84,29 @@ export default function Dashboard() {
           fetchData('/projects')
         ]);
 
+        const totalInvestment = analyticsRes.data.totalInvestment || 0;
+        const gasolineInvestment = totalInvestment / 2;
+        const solarInvestment = totalInvestment / 2;
+
+        const gasolineEnergy = gasolineInvestment * 6;
+        const solarEnergy = solarInvestment * 10;
+
+        const totalEnergy = gasolineEnergy + solarEnergy;
+        const totalSavings = totalEnergy * 0.10;
+
+        const gasolineLiters = gasolineEnergy / 33.6;
+        const gasolineCarbonOffset = gasolineLiters * 2.3;
+        const solarCarbonOffset = solarEnergy * 0.9;
+
+        const totalCarbonOffset = Math.round(gasolineCarbonOffset + solarCarbonOffset);
+
         setDashboardData({
           investments: investmentsRes.data || [],
-          analytics: analyticsRes.data || {
-            totalInvestment: 0,
-            totalEnergy: 0,
-            totalSavings: 0,
-            carbonOffset: 0,
+          analytics: {
+            totalInvestment,
+            totalEnergy,
+            totalSavings,
+            carbonOffset: totalCarbonOffset,
             history: []
           },
           projects: projectsRes.data || [],
@@ -138,10 +150,7 @@ export default function Dashboard() {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <span style={{ 
-          color: status === 'active' ? '#52c41a' : '#faad14',
-          textTransform: 'capitalize'
-        }}>
+        <span className={status === 'active' ? 'text-green-600' : 'text-yellow-500'}>
           {status}
         </span>
       ),
@@ -150,54 +159,107 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={200} theme="light">
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <Title level={4}>SunVest</Title>
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        {/* Logo Section */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center space-x-2">
+            <Sun className="h-6 w-6 text-orange-500" />
+            <span className="text-xl font-semibold text-gray-800">SunVest</span>
+          </div>
         </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[selectedMenu]}
-          onSelect={({ key }) => {
-            setSelectedMenu(key);
-            navigate(key);  // Redirect to the path associated with the menu item
-          }}
-          items={[
-            {
-              key: '1',
-              icon: <BarChartOutlined />,
-              label: 'Overview',
-            },
-            {
-              key: '/projects',
-              icon: <ProjectOutlined />,
-              label: 'Projects',
-            },
-            {
-              key: '3',
-              icon: <ThunderboltOutlined />,
-              label: 'Create Project',
-            },
-          ]}
-        />
-      </Sider>
-      
-      <Layout>
-        <Content style={{ margin: '24px 16px', padding: 24, background: '#fff' }}>
+        
+        {/* Navigation Links */}
+        <nav className="flex-1 p-4">
+          <div className="space-y-1">
+            <a 
+              href="/overview" 
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/dashboard');
+                setSelectedMenu('overview');
+              }}
+              className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${
+                selectedMenu === 'overview' 
+                  ? 'text-blue-600 bg-blue-50' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <LayoutDashboard className="h-5 w-5" />
+              <span>Overview</span>
+            </a>
+            
+            <a 
+              href="/projects"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/projects');
+                setSelectedMenu('projects');
+              }}
+              className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${
+                selectedMenu === 'projects' 
+                  ? 'text-blue-600 bg-blue-50' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <FolderKanban className="h-5 w-5" />
+              <span>Projects</span>
+            </a>
+            
+            <a 
+              href="/create-project"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/create-project');
+                setSelectedMenu('create-project');
+              }}
+              className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${
+                selectedMenu === 'create-project' 
+                  ? 'text-blue-600 bg-blue-50' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <PlusCircle className="h-5 w-5" />
+              <span>Create Project</span>
+            </a>
+          </div>
+        </nav>
+        
+        {/* User Section */}
+        <div className="p-4 border-t border-gray-200">
+          <button 
+            onClick={() => navigate('/register')}
+            className="flex items-center space-x-3 px-3 py-2 w-full text-gray-700 rounded-lg hover:bg-gray-100"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-8">
+        {user && (
+            <p className="mt-2 text-3xl mb-8 text-gray-600">
+              Welcome back, {user.name}
+            </p>
+          )}
           {error && (
             <Alert
               message="Error"
               description={error}
               type="error"
               showIcon
-              style={{ marginBottom: 24 }}
+              className="mb-6"
               action={
                 <Button 
                   type="primary" 
@@ -221,95 +283,95 @@ export default function Dashboard() {
                   />
                 </Card>
               </Col>
-            <Col span={6}>
-              <Card>
-                <Statistic
-                  title="Energy Generated"
-                  value={dashboardData.analytics.totalEnergy}
-                  suffix="kWh"
-                />
-              </Card>
-            </Col>
-            <Col span={6}>
-              <Card>
-                <Statistic
-                  title="Financial Savings"
-                  value={dashboardData.analytics.totalSavings}
-                  prefix="$"
-                  precision={2}
-                />
-              </Card>
-            </Col>
-            <Col span={6}>
-              <Card>
-                <Statistic
-                  title="Carbon Offset"
-                  value={dashboardData.analytics.carbonOffset}
-                  suffix="kg"
-                />
-              </Card>
-            </Col>
+              <Col span={6}>
+                <Card>
+                  <Statistic
+                    title="Energy Generated"
+                    value={dashboardData.analytics.totalEnergy}
+                    suffix="kWh"
+                  />
+                </Card>
+              </Col>
+              <Col span={6}>
+                <Card>
+                  <Statistic
+                    title="Financial Savings"
+                    value={dashboardData.analytics.totalSavings}
+                    prefix="$"
+                    precision={2}
+                  />
+                </Card>
+              </Col>
+              <Col span={6}>
+                <Card>
+                  <Statistic
+                    title="Carbon Offset"
+                    value={dashboardData.analytics.carbonOffset}
+                    suffix="kg"
+                  />
+                </Card>
+              </Col>
 
-            {/* Energy Production Chart */}
-            <Col span={16}>
-              <Card title="Energy Production History">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={dashboardData.energyHistory}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line 
-                      type="monotone" 
-                      dataKey="amount" 
-                      stroke="#8884d8" 
-                      name="Energy (kWh)" 
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Card>
-            </Col>
+              {/* Energy Production Chart */}
+              <Col span={16}>
+                <Card title="Energy Production History">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={dashboardData.energyHistory}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line 
+                        type="monotone" 
+                        dataKey="amount" 
+                        stroke="#8884d8" 
+                        name="Energy (kWh)" 
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Card>
+              </Col>
 
-            {/* Investment Distribution */}
-            <Col span={8}>
-              <Card title="Investment Distribution">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={dashboardData.investments}
-                      dataKey="investmentAmount"
-                      nameKey="project.name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      fill="#8884d8"
-                      label
-                    >
-                      {dashboardData.investments.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Card>
-            </Col>
+              {/* Investment Distribution */}
+              <Col span={8}>
+                <Card title="Investment Distribution">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={dashboardData.investments}
+                        dataKey="investmentAmount"
+                        nameKey="project.name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        fill="#8884d8"
+                        label
+                      >
+                        {dashboardData.investments.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </Card>
+              </Col>
 
-            {/* Investments Table */}
-            <Col span={24}>
-              <Card title="Your Investments">
-                <Table
-                  dataSource={dashboardData.investments}
-                  columns={investmentColumns}
-                  rowKey="_id"
-                  pagination={{ pageSize: 5 }}
-                />
-              </Card>
-            </Col>
-          </Row>
+              {/* Investments Table */}
+              <Col span={24}>
+                <Card title="Your Investments">
+                  <Table
+                    dataSource={dashboardData.investments}
+                    columns={investmentColumns}
+                    rowKey="_id"
+                    pagination={{ pageSize: 5 }}
+                  />
+                </Card>
+              </Col>
+            </Row>
           )}
-        </Content>
-      </Layout>
-    </Layout>
+        </div>
+      </div>
+    </div>
   );
 }
