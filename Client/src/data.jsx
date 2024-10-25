@@ -7,13 +7,15 @@ import { profile2, profile3,profile4,profile5,
 
 export const navTabs = [
     {name:"Home",id:'header'},
-    {name:"Services",id:'services'},
     {name:"About Us",id:'about'},
     {name:"Project",id:'project'},
-    {name:"Team",id:'team'},
+    {name:"Invest",id:'invest'},
+    {name:"Subscribe",id:'subscribe'},
+    {name:"Dashboard",id:'dashbooard'},
+    {name:"FAQ And Blogs",id:'faq'},
+    {name:"Contact Us",id:'contact'},
     {name:"Clients",id:'testimonial'},
-    {name:"FAQ",id:'faq'},
-    {name:"Contact",id:'contact'},
+    {name:"Team",id:'team'},
 ];
 
 export const services = [
