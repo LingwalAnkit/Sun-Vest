@@ -33,8 +33,8 @@ export default function Login() {
     }
   }; 
     return(   
-    <div>
-      <Card className="form-conatiner rounded-3xl">
+    <div className="min-h-screen bg-[#cbdbff] flex items-center justify-center p-4">
+      <Card className="w-full max-w-[900px] rounded-3xl border border-gray-300 shadow-lg">
         <Flex gap="large">
             <Flex flex={1}>
                 <img src={loginpic} className="w-full bg-blue-200 rounded-3xl"></img>

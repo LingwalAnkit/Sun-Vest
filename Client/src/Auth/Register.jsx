@@ -1,7 +1,6 @@
-import { Card, Flex, Typography, Form, Input, Button , Alert} from "antd";
-import { Link } from "react-router-dom"; 
+import { Card, Flex, Typography, Form, Input, Button, Alert } from "antd";
+import { Link } from "react-router-dom";
 import registerImage from "../assets/registerImage.png"
-
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../features/auth/authAction';
 import { useNavigate } from 'react-router-dom';
@@ -11,9 +10,8 @@ import { useEffect } from 'react';
 export default function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, successMessage ,setError } = useSelector((state) => state.auth);
+  const { loading, error, successMessage, setError } = useSelector((state) => state.auth);
 
-  // Clear messages when component unmounts
   useEffect(() => {
     return () => {
       dispatch(clearMessages());
@@ -22,63 +20,62 @@ export default function Register() {
 
   const handelRegister = async (values) => {
     try {
-        if (values.password !== values.passwordConfirm) {
-            dispatch(setError("Passwords do not match"));
-            return;
-        }
-        await dispatch(register(values));
-        // Set success message and navigate after a delay
-        setTimeout(() => {
+      if (values.password !== values.passwordConfirm) {
+        dispatch(setError("Passwords do not match"));
+        return;
+      }
+      await dispatch(register(values));
+      setTimeout(() => {
         navigate('/dashboard');
-        }, 2000); // 2 second delay
+      }, 2000);
     } catch (err) {
-        console.error('Registration failed:', err);
+      console.error('Registration failed:', err);
     }
   };
 
   return (
-    <div>
-      <Card className="form-conatiner rounded-3xl">
-        <Flex gap="large">
-            <Flex vertical flex={1} className="justify-center">
+    <div className="min-h-screen bg-[#cbdbff] flex items-center justify-center p-4">
+      <Card className="w-full max-w-[900px] rounded-3xl border border-gray-300 shadow-lg">
+        <Flex gap="large" className="flex-col md:flex-row">
+          <Flex vertical flex={1} className="justify-center">
             <Typography.Title level={3} strong className="slogan">
-                Create an Account
+              Create an Account
             </Typography.Title>
             <Typography.Text type="secondary" strong className="slogan mb-4">
               Empowering Communities, One Sunbeam at a Time.
             </Typography.Text>
             <Form layout="vertical" onFinish={handelRegister} autoComplete="off">
-                <Form.Item
-                    label="Full Name"
-                    name="name"
-                    className="mb-2"
-                    rules={[
-                    {
-                        required: true,
-                        message: "Please input your Full Name",
-                    },
-                    ]}
-                >
-                    <Input size="large" placeholder="Enter Your Full Name" />
-                </Form.Item>
-                <Form.Item
-                    label="Email"
-                    name="email"
-                    className="mb-2"
-                    rules={[
-                    {
-                        required: true,
-                        message: "Please input your Email",
-                    },
-                    {
-                        type: "email",
-                        message: "The input is not valid",
-                    },
-                    ]}
-                >
-                    <Input size="large" placeholder="Enter Your Email" />
-                </Form.Item>
-                <Form.Item
+              <Form.Item
+                label="Full Name"
+                name="name"
+                className="mb-2"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Full Name",
+                  },
+                ]}
+              >
+                <Input size="large" placeholder="Enter Your Full Name" />
+              </Form.Item>
+              <Form.Item
+                label="Email"
+                name="email"
+                className="mb-2"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Email",
+                  },
+                  {
+                    type: "email",
+                    message: "The input is not valid",
+                  },
+                ]}
+              >
+                <Input size="large" placeholder="Enter Your Email" />
+              </Form.Item>
+              <Form.Item
                 label="Password"
                 name="password"
                 className="mb-2"
@@ -151,18 +148,18 @@ export default function Register() {
                   Create Account
                 </Button>
               </Form.Item>
-                <Form.Item>
-                    <Link to="/login">
-                    <Button size="large" className="w-full bg-blue-500 rounded-xl">
-                        Sign-In
-                    </Button>
-                    </Link>
-                </Form.Item>
+              <Form.Item>
+                <Link to="/login">
+                  <Button size="large" className="w-full bg-blue-500 rounded-xl">
+                    Sign-In
+                  </Button>
+                </Link>
+              </Form.Item>
             </Form>
-            </Flex>
-            <Flex flex={1}>
-                <img src={registerImage} className="w-full bg-blue-200 rounded-3xl"></img>
-            </Flex>
+          </Flex>
+          <Flex flex={1} className="hidden md:flex">
+            <img src={registerImage} alt="Register illustration" className="w-full h-full object-cover bg-blue-200 rounded-3xl" />
+          </Flex>
         </Flex>
       </Card>
     </div>
