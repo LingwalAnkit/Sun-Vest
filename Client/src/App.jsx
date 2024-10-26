@@ -11,6 +11,8 @@ import { Provider } from 'react-redux';
 import { store } from './app/store';
 import Home from "./Components/Home"
 import Managment from "./Components/Managment"
+import SubscriptionPage from './Components/Subscribe/subscribe';
+import InvestPage from './Components/Invest/invest';
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
           <Route path='/' element={<Home/>}></Route>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/subscribe" element={<SubscriptionPage />} />
+          <Route path='/invest' element={<InvestPage></InvestPage>}/>
           {/* <Route path="/chart" element={< Charts />} /> */}
           <Route 
             path="/dashboard" 

@@ -5,6 +5,7 @@ import Header from './header/Header';
 import Achievement from './Achievement/Achievement';
 import About from './about/About';
 import Services from './Servicess/Services';
+import Footer from './footer/footer';
 
 const Home = () => {
     return (<>
@@ -13,6 +14,7 @@ const Home = () => {
         <Achievement/>
         <About/>
         <Services/>
+        <Footer></Footer>
     </>
     )
 }
