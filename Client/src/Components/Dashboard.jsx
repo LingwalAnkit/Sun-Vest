@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 import { Sun, LayoutDashboard, FolderKanban, PlusCircle, LogOut } from 'lucide-react';
 import { getAuthToken } from '../utils/auth';
+import EnergyHistoryChart from './EnergyHistory';  
 
 const { Title } = Typography;
 
@@ -26,6 +27,8 @@ const initialDashboardData = {
   projects: [],
   energyHistory: []
 };
+
+
 
 export default function Dashboard() {
   const [selectedMenu, setSelectedMenu] = useState('overview');
@@ -377,24 +380,12 @@ export default function Dashboard() {
               </Col>
 
               {/* Energy Production Chart */}
-              <Col span={16}>
-                <Card title="Energy Production History">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={dashboardData.energyHistory}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line 
-                        type="monotone" 
-                        dataKey="amount" 
-                        stroke="#8884d8" 
-                        name="Energy (kWh)" 
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </Card>
-              </Col>
+{/* Energy Production Chart */}
+<Col span={16}>
+  <Card title="Energy Production History">
+    <EnergyHistoryChart data={dashboardData.energyHistory} />
+  </Card>
+</Col>
 
               {/* Investment Distribution */}
               <Col span={8}>
