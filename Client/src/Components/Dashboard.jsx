@@ -33,7 +33,7 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(initialDashboardData);
   const navigate = useNavigate();
-  const {  user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
   const fetchData = async (endpoint) => {
     try {
@@ -100,8 +100,27 @@ export default function Dashboard() {
 
         const totalCarbonOffset = Math.round(gasolineCarbonOffset + solarCarbonOffset);
 
+        // Consolidate investments by project
+        const consolidatedInvestments = investmentsRes.data.reduce((acc, investment) => {
+          const projectName = investment.project.name;
+          const existingProject = acc.find(item => item.project.name === projectName);
+          
+          if (existingProject) {
+            existingProject.investmentAmount += investment.investmentAmount;
+            existingProject.shares += investment.shares;
+          } else {
+            acc.push({
+              ...investment,
+              shares: investment.shares,
+              investmentAmount: investment.investmentAmount
+            });
+          }
+          return acc;
+        }, []);
+
         setDashboardData({
-          investments: investmentsRes.data || [],
+          investments: investmentsRes.data, // Keep original data for the table
+          consolidatedInvestments, // Add consolidated data for the pie chart
           analytics: {
             totalInvestment,
             totalEnergy,
@@ -156,6 +175,51 @@ export default function Dashboard() {
       ),
     }
   ];
+
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, name }) => {
+    const RADIAN = Math.PI / 180;
+    // Increase the radius to push labels further out
+    const radius = outerRadius * 1.2;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    
+    // Calculate the line end points for the label connector
+    const innerX = cx + (outerRadius * 0.95) * Math.cos(-midAngle * RADIAN);
+    const innerY = cy + (outerRadius * 0.95) * Math.sin(-midAngle * RADIAN);
+    
+    // Calculate text anchor based on which quadrant the label is in
+    const textAnchor = x > cx ? 'start' : 'end';
+    
+    // Format the percentage
+    const percentageFormatted = `${(percent * 100).toFixed(0)}%`;
+  
+  
+    return (
+      <>
+        {/* Draw connecting line */}
+        <path
+          d={`M ${innerX},${innerY} L ${x},${y}`}
+          stroke="#666"
+          fill="none"
+          className="text-xs"
+        />
+        
+        {/* Add label background for better readability */}
+        <g>
+          <text
+            x={x}
+            y={y}
+            textAnchor={textAnchor}
+            dominantBaseline="middle"
+            className="text-xs fill-gray-600"
+            style={{ fontWeight: 500 }}
+          >
+            {`${name} (${percentageFormatted})`}
+          </text>
+        </g>
+      </>
+    );
+  };
 
   if (loading) {
     return (
@@ -248,7 +312,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="p-8">
-        {user && (
+          {user && (
             <p className="mt-2 text-3xl mb-8 text-gray-600">
               Welcome back, {user.name}
             </p>
@@ -337,20 +401,22 @@ export default function Dashboard() {
                 <Card title="Investment Distribution">
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
-                      <Pie
-                        data={dashboardData.investments}
-                        dataKey="investmentAmount"
-                        nameKey="project.name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        fill="#8884d8"
-                        label
-                      >
-                        {dashboardData.investments.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
+                    <Pie
+  data={dashboardData.consolidatedInvestments}
+  dataKey="investmentAmount"
+  nameKey="project.name"
+  cx="50%"
+  cy="50%"
+  outerRadius={60} // Reduced from 80 to give more space for labels
+  fill="#8884d8"
+  label={renderCustomizedLabel}
+  labelLine={false} // Remove default label lines
+  paddingAngle={2} // Add slight padding between segments
+>
+  {dashboardData.consolidatedInvestments.map((entry, index) => (
+    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+  ))}
+</Pie>
                       <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
