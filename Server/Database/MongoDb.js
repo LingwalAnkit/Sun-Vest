@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-mongoose.connect('mongodb://127.0.0.1:27017/SunVest')
+mongoose.connect('mongodb+srv://ankitlingwal9:L6pPo0P0Ugrf3IGE@cluster0.819jo.mongodb.net/SunVest?retryWrites=true&w=majority&appName=Cluster0')
 .then (()=>{
     console.log("Database connected")
 })
