@@ -87,7 +87,7 @@ const ProjectList = () => {
       key: 'create',
       icon: <PlusCircle className="h-5 w-5" />,
       label: 'Create Project',
-      onClick: () => navigate('/create-project')
+      onClick: () => navigate('/managment')
     }
   ];
 

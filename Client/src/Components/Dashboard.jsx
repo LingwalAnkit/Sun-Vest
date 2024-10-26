@@ -215,10 +215,10 @@ export default function Dashboard() {
             </a>
             
             <a 
-              href="/create-project"
+              href="/managment"
               onClick={(e) => {
                 e.preventDefault();
-                navigate('/create-project');
+                navigate('/managment');
                 setSelectedMenu('create-project');
               }}
               className={`flex items-center space-x-3 px-3 py-2 rounded-lg ${

@@ -10,6 +10,7 @@ import PrivateRoute from './Components/PrivateRoute';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import Home from "./Components/Home"
+import Managment from "./Components/Managment"
 
 function App() {
   return (
@@ -32,6 +33,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Projects />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/managment" 
+            element={
+              <PrivateRoute>
+                <Managment/>
               </PrivateRoute>
             } 
           />
