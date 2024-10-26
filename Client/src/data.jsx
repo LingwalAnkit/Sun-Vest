@@ -13,8 +13,6 @@ export const navTabs = [
     {name:"Subscribe",id:'subscribe'},
     {name:"FAQ And Blogs",id:'faq'},
     {name:"Contact Us",id:'contact'},
-    {name:"Clients",id:'testimonial'},
-    {name:"Team",id:'team'},
 ];
 
 export const services = [
